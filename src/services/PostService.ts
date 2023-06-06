@@ -1,0 +1,30 @@
+// type
+import PostType from "../types/PostType";
+// repository
+import RepositoryFactory from "../repositories/RepositoryFactory";
+
+class PostService {
+  static async getList(): Promise<PostType[]> {
+    try {
+      const res = await RepositoryFactory.post.getList();
+      return res.data.data.posts.edges.map((data: any) => {
+        // ↓　型指定することでわざわざ全項目書かないといけなくなるが、変更があった時エラーを出してくれるので便利
+        const post: PostType = {
+          id: data.node.id,
+          title: data.node.title,
+          date: data.node.date,
+          content: data.node.content,
+          excerpt: data.node.excerpt,
+          featuredImage: {
+            url: data.node.featuredImage.node.sourceUrl,
+          },
+        };
+        return post;
+      });
+    } catch {
+      return [];
+    }
+  }
+}
+
+export default PostService;
